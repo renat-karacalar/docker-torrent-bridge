@@ -1,4 +1,4 @@
-#qBittorrent Web Interface with Flask
+qBittorrent Web Interface with Flask
 Overview
 
 This Flask-based web application provides a secure web interface for interacting with a local qBittorrent server. Users can add magnet URLs to initiate downloads, view torrent progress, and authenticate using TOTP (Time-Based One-Time Password) codes.
