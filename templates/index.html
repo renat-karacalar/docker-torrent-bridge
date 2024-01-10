@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        form {
+            background-color: #ffffff;
+            width: 600px; 
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        label,
+        select,
+        input,
+        button {
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        select {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            appearance: none;
+            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 10px center;
+            background-size: 12px 12px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            z-index: 2;
+        }
+
+        textarea {
+            width: 580px;
+            height: 200px; /* Adjust height as needed */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: #333;
+            resize: none; /* Prevent resizing */
+            z-index: 1;
+        }
+
+        textarea:disabled {
+            background-color: #f2f2f2;
+            cursor: not-allowed;
+        }
+
+        .gif-container {
+        position: fixed;     /* Position fixed to stick to the viewport */
+        top: 58%;           /* Align to the vertical center of the viewport */
+        left: 0;            /* Start from the left edge of the viewport */
+        z-index: 0;      /* Ensure the GIF is above other elements */
+        }
+
+        .gif-container img {
+            max-width: 100px;    /* Start with a small width */
+            height: auto;
+            animation: move 35s forwards /* Use 'move' animation */
+        }
+
+        @keyframes move {
+            0% {
+                transform: translateX(0) scale(1);
+            } 
+            100% {
+                transform: translateX(1250%) scale(3);
+            }
+        }
+
+        /* Existing CSS ... */
+
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-row .name {
+            flex-grow: 0;
+            margin-right: 10px;
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Show ellipsis for overflow */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .progress-row progress {
+            flex-grow: 1;
+            width: 30vh;
+            height: 10px; /* Set the height of the progress bar */
+            margin-right: 10px;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <form method="post" id="myForm">
+        <label for="dropdown">Torrent Type:</label>
+        <select id="dropdown" name="dropdown" onchange="toggleTextField()">
+            <option value="" disabled selected>Please choose</option>
+            <option value="option1">TV Series</option>
+            <option value="option2">Movies</option>
+            <option value="option3">Others</option>
+        </select>        
+        <label for="text_field">Magnet Url:</label>
+        <textarea id="text_field" name="text_field" rows="6" disabled></textarea>
+        <button type="submit">Submit</button>
+
+        <div class="gif-container">
+            <img src="{{ gif }}" alt="Waddling Duck">
+        </div>
+        <div id="progressRows">
+            <!-- Rows will be added here -->
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </form>
+
+
+    <script>
+        function toggleTextField() {
+            const dropdown = document.getElementById('dropdown');
+            const textField = document.getElementById('text_field');
+            if (dropdown.value === '') {
+                textField.value = "Please select an option from the dropdown.";
+                textField.disabled = true;
+            } else {
+                textField.value = '';
+                textField.disabled = false;
+                textField.focus();  // Set focus to the text field
+                textField.setSelectionRange(0, 0);  // Set cursor position to the start
+                }
+            }
+
+        function fetchAndUpdateProgress() {
+            fetch('/update_progress')
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous progress rows
+                const progressRowsDiv = document.getElementById('progressRows');
+                progressRowsDiv.innerHTML = '';
+
+                // Update progress bars for each item
+                data.forEach(item => {
+                    addProgressRow(item.name, item.progress, item.eta);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching progress:', error);
+            });
+        }
+
+        function addProgressRow(name, progressValue, etaValue) {
+            const progressRowsDiv = document.getElementById('progressRows');
+
+            // Truncate the name if it's longer than 30 characters
+            let truncatedName = name.length > 50 ? name.substring(0, 47) + '...' : name;
+
+            // Pad the name with whitespaces if it's shorter than 30 characters
+            if (truncatedName.length < 30) {
+                truncatedName = truncatedName.padEnd(30, ' ');
+            }
+
+            // Create new div for the row
+            const rowDiv = document.createElement('div');
+            rowDiv.classList.add('progress-row');
+
+            // Create div for the inner content with fixed width
+            const innerDiv = document.createElement('div');
+            innerDiv.classList.add('inner-content');
+
+            // Create div for name and set overflow to hidden
+            const nameDiv = document.createElement('div');
+            nameDiv.classList.add('name');
+            nameDiv.style.width = '40vh'; // Set a fixed width for nameDiv
+            nameDiv.textContent = truncatedName;
+            innerDiv.appendChild(nameDiv);
+
+            // Create progress bar
+            const progressBar = document.createElement('progress');
+            progressBar.value = progressValue;
+            progressBar.max = 100;
+            progressBar.style.width = '40vh'
+            innerDiv.appendChild(progressBar);
+
+            // Convert ETA value to "ETA: X h Y min" format if it's less than 864000000
+            let etaText;
+            if (etaValue === 864000000) {
+                etaText = 'N/A';
+            } else {
+                const hours = Math.floor((etaValue / 100) / 3600);
+                const minutes = Math.floor(((etaValue / 100) % 3600) / 60);
+                etaText = `ETA: ${hours} h ${minutes} min`;
+            }
+
+            // Create span for ETA
+            const etaSpan = document.createElement('span');
+            etaSpan.style.width = '80px'; // Set a fixed width for etaSpan
+            etaSpan.textContent = etaText;
+            innerDiv.appendChild(etaSpan);
+
+            // Set a fixed width for the innerDiv
+            innerDiv.style.width = '100%'; // Adjust this value as per your requirement
+
+            // Append innerDiv to rowDiv
+            rowDiv.appendChild(innerDiv);
+
+            // Append row to the progressRows div
+            progressRowsDiv.appendChild(rowDiv);
+        }
+
+
+
+
+
+        fetchAndUpdateProgress();
+        // Fetch progress every 5 seconds (for example)
+        setInterval(fetchAndUpdateProgress, 5000);
+
+    </script>
+</body>
+
+</html>

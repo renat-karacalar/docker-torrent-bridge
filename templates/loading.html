@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .main-container {
+            background-color: #ffffff;
+            width: 600px;
+            padding: 40px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1); /* Shadow */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* Added for the GIF positioning */
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 8px; /* Rounded corners */
+            overflow: hidden; /* Hide overflow */
+            margin-top: 30px;
+        }
+
+        .loading-progress {
+            width: 0;
+            height: 100%;
+            background-color: #007bff; /* Loading bar color */
+            animation: progress 10s infinite; /* Animation */
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        .gif-container {
+            position: relative; /* Absolute positioning */
+            top: 0px; /* Adjust based on your design */
+        }
+
+        .gif-container img {
+            max-width: 300px;
+            height: auto;
+        }
+
+        .logs-container {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto; /* Add scrollbar if content exceeds max height */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace; /* Use a monospace font for consistent spacing */
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="gif-container">
+            <img src="{{ gif }}" alt="Waddling Duck">
+        </div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+        <div class="logs-container">
+          <!-- Logs will be appended here -->
+        </div>
+      
+    </div>
+
+    <script>
+      const presetLogs = [
+          "Quantum tunneling through firewall layers...",
+          "Summoning digital spirits for debugging...",
+          "Consulting AI oracles for system predictions...",
+          "Calibrating the flux capacitor...",
+          "Translating binary into iambic pentameter...",
+          "Defragmenting the digital soul of the server...",
+          "Initializing distributed data storage...",
+          "Synchronizing torrent meta-data...",
+          "Optimizing bandwidth allocation...",
+          "Monitoring peer-to-peer connections...",
+          "Encrypting communication channels...",
+          "Refreshing cache for improved performance...",
+          "Scanning for malware signatures...",
+          "Compiling and executing query optimizations...",
+          "Handling redundant network paths...",
+          "Performing data integrity checks...",
+          "Decrypting the neural net interface...",
+          "Initializing subspace communication array...",
+          "Tuning the harmonic resonance of data streams...",
+          "Warping spacetime to compress log files...",
+          "Navigating the data labyrinth for hidden gems...",
+          "Rebooting the cosmic energy matrix...",
+          "Balancing the quantum flux capacitance...",
+          "Transmuting data packets into ethereal signals...",
+          "Optimizing the chakra points of the server...",
+          "Harmonizing the digital frequency spectrum...",
+          "Aligning the stars for optimal server performance...",
+          "Communing with the server deities for blessings...",
+          "Evolving the server's consciousness for better AI...",
+          "Fusing the essence of the server with the cloud...",
+          "Refining the alchemical properties of data..."
+      ];
+
+
+      function appendRandomLog() {
+          const randomLog = presetLogs[Math.floor(Math.random() * presetLogs.length)];
+          const currentDate = new Date();
+          const hours = String(currentDate.getHours()).padStart(2, '0');
+          const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+          const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+          const milliseconds = String(currentDate.getMilliseconds()).padStart(3, '0');
+          const logTimestamp = `${hours}:${minutes}:${seconds}.${milliseconds}`;
+          const logsContainer = document.querySelector('.logs-container');
+          const logElement = document.createElement('div');
+          logElement.textContent = `${logTimestamp} - ${randomLog}`;
+          logsContainer.appendChild(logElement);
+          logsContainer.scrollTop = logsContainer.scrollHeight;
+      }
+
+      function logWithRandomizedInterval() {
+          const delay = Math.random() * 2000 + 500; // Random value between 500 to 1000
+          setTimeout(function() {
+              appendRandomLog();
+              logWithRandomizedInterval();
+          }, delay);
+      }
+
+      logWithRandomizedInterval();
+
+      function simulateLoading() {
+          // You can replace this setTimeout with actual tasks if needed
+          setTimeout(() => {
+              // Redirect to index.html after loading is finished
+              window.location.href = '/';
+          }, 9500);  
+      }
+
+      // Call the function to start the loading simulation
+      simulateLoading();
+    </script>
+</body>
+
+</html>
