@@ -121,9 +121,6 @@ def login():
 
 
 if __name__ == '__main__':
-    # For running outside Docker (local development)
-    #app.run(debug=True, port=5000, ssl_context=('cert.pem', 'key.pem'))
-    
     # For running inside Docker
     port = int(os.environ.get('PORT', 4000))
     app.run(debug=True, host='0.0.0.0', port=port, ssl_context=('/app/dockerbinding/ssl/cert.pem', '/app/dockerbinding/ssl/key.pem'))
